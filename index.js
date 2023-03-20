@@ -1,24 +1,14 @@
 const { REST, Routes } = require('discord.js');
 const commands = [
 	  {
-		      name: 'gpt35',
-		      description: 'chatgpt 3.5 を利用します',
+		      name: 'dalle2',
+		      description: 'DALL-E2 を利用します',
 		    },
 ];
 
 let DISCORD_TOKEN = ""
 let DISCORD_CLIENT_ID = ""
 let CHATGPT_TOKEN = ""
-
-let chatHistories = [];
-function saveChatHistory(role,message){
-  chatHistories.push({
-    role: role,
-    message: message,
-    timestamp: new Date()
-  })
-}
-
 
 const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
 
@@ -50,12 +40,12 @@ client.on('ready', async () => {
 
 client.on('interactionCreate', async interaction => {
   if (interaction.isChatInputCommand()){
-    if (interaction.commandName === 'gpt35') {
+    if (interaction.commandName === 'dalle2') {
       const modal = new ModalBuilder()
-        .setCustomId('gpt35')
-        .setTitle('gpt35');
+        .setCustomId('dalle2')
+        .setTitle('dalle2');
       const hobbiesInput = new TextInputBuilder()
-        .setCustomId('questionsInput')
+        .setCustomId('requestInput')
         .setLabel("please type your request for chatgpt")
         .setStyle(TextInputStyle.Paragraph);
       const firstActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
@@ -64,30 +54,26 @@ client.on('interactionCreate', async interaction => {
     }
   }
   if (interaction.isModalSubmit()){
-    const value = interaction.fields.getTextInputValue('questionsInput');
-    saveChatHistory("user",value);
-    await interaction.deferReply("chatgpt is thinking...");
+    const value = interaction.fields.getTextInputValue('requestInput');
+    await interaction.deferReply("dalle2 is drowing...");
     
     let data = {
-      model:"gpt-3.5-turbo",
-      messages: [
-      ],
-      temperature:0.7
+      "prompt": value,
+      "n": 2,
+      "size": "1024x1024"
     }
-
-    chatHistories.forEach((history) => {
-      data.messages.push({role:history.role,content:history.message})
-    })
 
     let headers = {
       "Content-Type":'application/json',
       "Authorization":`Bearer ${CHATGPT_TOKEN}`
     }
 
-    var gptres = await axios.post("https://api.openai.com/v1/chat/completions", data, {headers: headers})
-    var gptresponse = gptres.data.choices[0].message.content;
-    saveChatHistory("assistant",gptresponse)
-    var message = `> ${value}\n` + gptresponse;
+    var message = `> ${value}`;
+    var gptres = await axios.post("https://api.openai.com/v1/images/generations", data, {headers: headers})
+    gptres.data.data.forEach((data) => {
+      var url = data.url;
+      message += `\n${url}`;
+    })
     await interaction.followUp(message);
   }
 });

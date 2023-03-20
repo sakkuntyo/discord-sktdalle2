@@ -1,9 +1,10 @@
 {
   "dependencies": {
+    "applicationinsights": "^2.5.0",
     "axios": "^1.3.4",
     "discord.js": "^14.8.0"
   },
-  "name": "discord-sktgpt35",
+  "name": "discord-sktdalle2",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
