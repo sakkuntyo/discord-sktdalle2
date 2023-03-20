@@ -9,7 +9,6 @@ const commands = [
 let DISCORD_TOKEN = ""
 let DISCORD_CLIENT_ID = ""
 let CHATGPT_TOKEN = ""
-
 const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
 
 (async () => {
@@ -46,7 +45,7 @@ client.on('interactionCreate', async interaction => {
         .setTitle('dalle2');
       const hobbiesInput = new TextInputBuilder()
         .setCustomId('requestInput')
-        .setLabel("please type your request for chatgpt")
+        .setLabel("please type your request for dalle2")
         .setStyle(TextInputStyle.Paragraph);
       const firstActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
       modal.addComponents(firstActionRow);
@@ -55,7 +54,7 @@ client.on('interactionCreate', async interaction => {
   }
   if (interaction.isModalSubmit()){
     const value = interaction.fields.getTextInputValue('requestInput');
-    await interaction.deferReply("dalle2 is drowing...");
+    await interaction.deferReply("drawing...");
     
     let data = {
       "prompt": value,
